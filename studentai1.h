@@ -5,12 +5,18 @@
 #include <vector>
 #include <algorithm>
 
-struct Studentas {
-    std::string vardas, pavarde;
-    std::vector<int> paz;
-    int egz = 0;
-    double vid = 0.0;
-    double med = 0.0;
+class Studentas {
+private:
+    std::string vardas_;
+    std::string pavarde_;
+    std::vector<int> paz_;
+    int egz_ = 0;
+    double vid_ = 0.0;
+    double med_ = 0.0;
+public:
+    Studentas() : egz_(0), vid_(0.0), med_(0.0) {}
+};
+
 
     void skaiciuoti() {
         int n = (int)paz.size();
@@ -30,6 +36,6 @@ struct Studentas {
 
         med = med * 0.4 + egz * 0.6;
     }
-};
+
 
 #endif
