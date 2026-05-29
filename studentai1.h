@@ -15,7 +15,7 @@ private:
     double med_ = 0.0;
 public:
     Studentas() : egz_(0), vid_(0.0), med_(0.0) {}
-};
+
 
 void skaiciuoti() {
     int n = (int)paz_.size();
@@ -35,8 +35,14 @@ void skaiciuoti() {
         med_ = (sorted[n / 2 - 1] + sorted[n / 2]) / 2.0;
     med_ = med_ * 0.4 + egz_ * 0.6;
 }
-    
-    
+
+public: 
+    Studentas(const std::string& vardas, const std::string& pavarde,
+        const std::vector<int>& paz, int egz)
+        : vardas_(vardas), pavarde_(pavarde), paz_(paz), egz_(egz)
+    {
+        skaiciuoti();
+    }
 
 
 #endif
