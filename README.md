@@ -11,50 +11,184 @@ C++ programa skirta studentų pažymių valdymui. Programa leidžia įvesti stud
 | v1.0 | Pradinė realizacija su `struct Studentas`, vector/list/deque konteineriai, 3 skirstymo strategijos |
 | v1.1 | `struct` pakeista į `class`, pridėti konstruktoriai, destruktorius, getter/setter metodai |
 | v1.2 | Pridėti `operator<<` ir `operator>>`, pilnas Rule of Five, testų failas |
-| v1.3 | Sukurti abstrakčią klasę, kurioje negalima kurti žmogaus tipo objektų, derived klasė, testai|
+| v1.5 | Sukurta abstrakti bazinė klasė `Zmogus`, `Studentas` išvesta iš jos |
+| v2.0 | Doxygen dokumentacija, Google Test unit testai, CMake build sistema |
 
 ---
 
 ## Failų struktūra
 
 ```
-├── studentai1.h       # Studentas klasė
-├── funkcijos1.h       # Funkcijų deklaracijos
-├── funkcijos1.tpp     # Template funkcijų realizacijos
-├── funkcijos1.cpp     # Įvesties/išvesties funkcijų realizacijos
-├── main1.cpp          # Pagrindinis failas
-├── testas.cpp         # Vienetų testai
-└── zmogus.h           # Zmogus klasė
+├── zmogus.h               # Abstrakti bazinė klasė
+├── studentai1.h           # Studentas klasė (išvesta iš Zmogus)
+├── funkcijos1.h           # Funkcijų deklaracijos
+├── funkcijos1.tpp         # Template funkcijų realizacijos
+├── funckijos1.cpp         # Įvesties/išvesties funkcijų realizacijos
+├── main1.cpp              # Pagrindinis failas
+├── Testas.cpp             # Rankinis testų failas
+├── testas_gtest.cpp       # Google Test unit testai
+├── CMakeLists.txt         # CMake build konfigūracija
+├── Doxyfile               # Doxygen konfigūracija
+└── docs/                  # Sugeneruota dokumentacija (HTML + PDF)
+    ├── html/              # HTML dokumentacija
+    └── latex/             # LaTeX failai + refman.pdf
 ```
 
 ---
 
-## Studentas klasė
+## Reikalavimai
 
-### Privačios duomenų narės
-
-| Narė | Tipas | Aprašas |
-|------|-------|---------|
-| `vardas_` | `string` | Studento vardas |
-| `pavarde_` | `string` | Studento pavardė |
-| `paz_` | `vector<int>` | Namų darbų pažymiai |
-| `egz_` | `int` | Egzamino pažymys |
-| `vid_` | `double` | Galutinis balas (vidurkis) |
-| `med_` | `double` | Galutinis balas (mediana) |
+- C++17 ar naujesnė versija
+- CMake 3.14+ (unit testams su Google Test)
+- Doxygen (dokumentacijos generavimui)
+- Interneto ryšys pirmojo CMake paleidimo metu (Google Test atsisiunčiamas automatiškai)
 
 ---
 
-## Rule of Five
+## Kompiliavimas
 
-Visi penki metodai yra pilnai realizuoti `studentai1.h` faile:
+### Visual Studio
+1. Atidaryti `main1.vcxproj`
+2. Build → Build Solution (**Ctrl+Shift+B**)
+3. Paleisti (**Ctrl+F5**)
+
+### Komandinė eilutė (g++)
+```bash
+g++ -std=c++17 -O2 -o programa main1.cpp funckijos1.cpp
+./programa
+```
+
+---
+
+## Įdiegimas ir paleidimas su CMake
+
+```bash
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
+
+Programa paleidžiama:
+```bash
+./programa        # Linux/Mac
+programa.exe      # Windows
+```
+
+---
+
+## Unit testai
+
+### Rankinis testų failas (Testas.cpp)
+Veikia tiesiogiai Visual Studio — atskiras projektas toje pačioje solution.
+
+Paleidžiamas su **Ctrl+F5** kai `Testas` projektas nustatytas kaip startup.
+
+Išvestis:
+```
+========== Studentas / Zmogus klases testai (v1.5) ==========
+
+--- Zmogus abstraktumas ---
+  [PASS] Zmogus negali buti sukurtas tiesiogiai
+  [PASS] Zmogus* rodo i Studentas objekta
+  ...
+
+========== Rezultatai ==========
+Praejo  : 63
+Nepraejo: 0
+Visi testai sekmingai praejo!
+```
+
+---
+
+### Google Test (testas_gtest.cpp)
+
+#### Nustatymas Visual Studio
+
+1. Atsisiųsti Google Test iš [github.com/google/googletest/releases](https://github.com/google/googletest/releases)
+2. Išskleisti į projekto aplanką: `googletest-1.17.0/`
+3. Sukurti naują **Console App** projektą solution'e, pavadinti `Gtest`
+4. Pridėti šiuos failus prie `Gtest` projekto (**Add → Existing Item**):
+   - `testas_gtest.cpp`
+   - `googletest-1.17.0\googletest-1.17.0\googletest\src\gtest-all.cc`
+   - `googletest-1.17.0\googletest-1.17.0\googletest\src\gtest_main.cc`
+5. **Properties → C/C++ → General → Additional Include Directories** pridėti:
+   ```
+   C:\<path_to_project>
+   C:\<path_to_project>\googletest-1.17.0\googletest-1.17.0\googletest\include
+   C:\<path_to_project>\googletest-1.17.0\googletest-1.17.0\googletest
+   ```
+6. **Properties → C/C++ → Language → C++ Language Standard** nustatyti į `ISO C++17`
+7. Build ir paleisti
+
+#### Nustatymas su CMake (automatinis)
+
+```bash
+mkdir build
+cd build
+cmake ..
+cmake --build .
+./testai        # Linux/Mac
+testai.exe      # Windows
+```
+
+CMake automatiškai atsisiunčia Google Test — nereikia nieko papildomai diegti.
+
+#### Testų rezultatai
+
+| Testų grupė | Testų skaičius | Aprašas |
+|-------------|---------------|---------|
+| `ZmogusTest` | 2 | Abstraktumas, polimorfizmas |
+| `StudentasTest` | 16 | Visi konstruktoriai, operatoriai, setteriai |
+
+```
+[==========] 18 tests from 2 test suites ran.
+[  PASSED  ] 18 tests.
+```
+
+---
+
+## Dokumentacija
+
+### Peržiūrėti HTML dokumentaciją
+Atidaryti `docs/html/index.html` naršyklėje.
+
+### Generuoti dokumentaciją iš naujo
+```bash
+doxygen Doxyfile
+```
+
+### PDF dokumentacija
+`docs/latex/refman.pdf` — taip pat pridėta prie v2.0 release GitHub'e.
+
+---
+
+## Klasių struktūra
+
+```
+Zmogus  (abstrakti)
+│   vardas_, pavarde_
+│   virtual vid(), med(), finalize(), print()
+│
+└── Studentas
+        paz_, egz_, vid_, med_
+        operator<<, operator>>
+        Rule of Five (5 metodai)
+```
+
+---
+
+## Studentas klasė — Rule of Five
 
 | Metodas | Aprašas |
 |---------|---------|
-| Kopijuojantis konstruktorius | Gili kopija — originalas nepasikeičia |
-| Perkeliantis konstruktorius | Perima duomenis iš laikino objekto, šaltinis ištuštinamas |
-| Kopijuojantis priskyrimo operatorius | Kopijuoja duomenis, saugus savęs priskyrimo atveju |
-| Perkeliantis priskyrimo operatorius | Perima duomenis, šaltinis ištuštinamas |
-| Destruktorius | Atlaisvina atmintį, kviečiamas automatiškai |
+| Default konstruktorius | Sukuria tuščią studentą |
+| Parametrizuotas konstruktorius | `Studentas(vardas, pavarde, paz, egz)` |
+| Kopijavimo konstruktorius | Gili kopija — originalas nepasikeičia |
+| Perkėlimo konstruktorius | Perima duomenis, šaltinis ištuštinamas |
+| Kopijavimo priskyrimo operatorius | Saugus savęs priskyrimo atveju |
+| Perkėlimo priskyrimo operatorius | Perima duomenis, šaltinis ištuštinamas |
+| Destruktorius | Automatinis, virtualus |
 
 ---
 
@@ -62,11 +196,42 @@ Visi penki metodai yra pilnai realizuoti `studentai1.h` faile:
 
 ### `operator<<` — išvestis
 
-Leidžia išvesti studento duomenis į bet kokį išvesties srautą: `cout`, failą, `ostringstream`.
+Veikia per `Zmogus::print()` virtualų metodą. Leidžia išvesti į bet kokį srautą.
+
+```cpp
+Studentas s("Jonas", "Jonaitis", {6, 7, 8}, 9);
+
+// Į ekraną:
+cout << s;
+// Jonas Jonaitis 6 7 8 9 (vid: 7.40, med: 7.40)
+
+// Į failą:
+ofstream out("rezultatai.txt");
+out << s;
+
+// Per bazinės klasės rodyklę (polimorfizmas):
+Zmogus* ptr = &s;
+cout << *ptr;
+```
 
 ### `operator>>` — įvestis
 
-Leidžia nuskaityti studento duomenis iš bet kokio įvesties srauto: `cin`, failo, `istringstream`.
+Formatas: `Vardas Pavardė paz1 paz2 ... pazN egz`  
+Paskutinis skaičius visada egzaminas.
+
+```cpp
+// Iš klaviatūros:
+Studentas s;
+cin >> s;
+
+// Iš eilutės:
+istringstream iss("Petras Petraitis 5 6 7 8 9");
+iss >> s;
+
+// Iš failo:
+ifstream in("studentai.txt");
+in >> s;
+```
 
 ---
 
@@ -76,53 +241,55 @@ Leidžia nuskaityti studento duomenis iš bet kokio įvesties srauto: `cin`, fai
 Vartotojas įveda vardą, pavardę, pažymius ir egzaminą per konsolę.
 
 ### Įvestis automatiškai (pasirinkimai 2 ir 3)
-Programa pati sugeneruoja atsitiktinius pažymius arba atsitiktinius studentus su pažymiais.
+Programa sugeneruoja atsitiktinius pažymius arba studentus su pažymiais.
 
-### Įvestis iš failo (pasirinkimas 5 ir 6)
-Nuskaitoma iš `.txt` failo. Failo formatas:
+### Įvestis iš failo (pasirinkimai 5 ir 6)
+Failo formatas:
 ```
 Vardas Pavarde ND1 ND2 ND3 ND4 ND5 Egz
-Vardas1 Pavarde1 4 6 7 8 9 10
-Vardas2 Pavarde2 3 5 6 7 8 7
+Jonas Jonaitis 4 6 7 8 9 10
+Petras Petraitis 3 5 6 7 8 7
 ```
 
 ### Išvestis į ekraną
-Rodo vardą, pavardę ir galutinį balą (vidurkį arba medianą) lentelės formatu.
+Vardas, pavardė ir galutinis balas (vidurkiu arba mediana) lentelės formatu.
 
 ### Išvestis į CSV failą
-Išsaugo rezultatus CSV formatu, kurį galima atidaryti Excel programoje.
+Suderinamas su Excel programa.
 
 ### Išvestis į tekstinį failą
-Skirstymo rezultatai (vargšiukai / kietiakai) išsaugomi atskiruose failuose `vargsiukai.txt` ir `kietiakai.txt`.
+Skirstymo rezultatai išsaugomi `vargsiukai.txt` ir `kietiakai.txt`.
 
 ---
 
 ## Skirstymo strategijos
 
-| Strategija | Aprašas |
-|------------|---------|
-| `skirstyti1` | `partition_copy` — kopijuoja į du atskirus konteinerius |
-| `skirstyti2` | `copy_if` + `remove_if` — kopijuoja vargšiukus, šalina iš originalo |
-| `skirstyti3` | `partition` arba `splice` (list) — skirstoma vietoje |
+| Strategija | Metodas | Aprašas |
+|------------|---------|---------|
+| 1 | `partition_copy` | Kopijuoja į du atskirus konteinerius |
+| 2 | `copy_if` + `remove_if` | Kopijuoja vargšiukus, šalina iš originalo |
+| 3 | `partition` / `splice` | Skirstoma vietoje — greičiausia |
 
 ---
 
-## Kompiliavimas
+## Benchmark rezultatai — optimizavimo flag'ai (vector, strategija 3, 1 000 000 įrašų)
 
-```bash
-# Pagrindinis programas
-g++ -std=c++17 -O2 -o programa main2.cpp funkcijos2.cpp
+| Flag | Vykdymo laikas | Exe dydis |
+|------|---------------|-----------|
+| `-O0` / `/Od` | ~4.2 s | ~350 KB |
+| `-O1` / `/O1` | ~1.9 s | ~310 KB |
+| `-O2` / `/O2` | ~1.7 s | ~315 KB |
+| `-O3` | ~1.6 s | ~320 KB |
 
-# Testai
-g++ -std=c++17 -o testas testas.cpp
-./testas
+---
+
+## Programos meniu
+
 ```
-
----
-
-## Testų rezultatai
-
-<img width="1639" height="1420" alt="Screenshot 2026-05-29 050106" src="https://github.com/user-attachments/assets/1fe3a59d-ca5d-4ae6-9fa8-2510b3f99c3e" />
-<img width="1554" height="1405" alt="Screenshot 2026-05-29 050135" src="https://github.com/user-attachments/assets/d98cebc0-835d-4aa1-a1c4-e0c6a823cca0" />
-<img width="1741" height="1431" alt="Screenshot 2026-05-29 050123" src="https://github.com/user-attachments/assets/975cceda-861a-40ad-9df1-302afd73e9cd" />
-
+1 - ivedimas ranka
+2 - generuojami pazymiai
+3 - generuojami studentai ir pazymiai
+4 - baigti darba
+5 - nuskaityti faila (vector)
+6 - failo generavimas ir benchmark
+```
