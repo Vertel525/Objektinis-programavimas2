@@ -55,5 +55,29 @@ public:
         paz_(std::move(other.paz_)),
         egz_(other.egz_), vid_(other.vid_), med_(other.med_) {}
 
+    Studentas& operator=(const Studentas& other) {
+        if (this != &other) {
+            vardas_ = other.vardas_;
+            pavarde_ = other.pavarde_;
+            paz_ = other.paz_;
+            egz_ = other.egz_;
+            vid_ = other.vid_;
+            med_ = other.med_;
+        }
+        return *this;
+    }
 
+    Studentas& operator=(Studentas&& other) noexcept {
+        if (this != &other) {
+            vardas_ = std::move(other.vardas_);
+            pavarde_ = std::move(other.pavarde_);
+            paz_ = std::move(other.paz_);
+            egz_ = other.egz_;
+            vid_ = other.vid_;
+            med_ = other.med_;
+        }
+        return *this;
+    }
+
+    ~Studentas() {}
 #endif
