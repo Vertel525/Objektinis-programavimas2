@@ -1,0 +1,134 @@
+\doxysection{funkcijos1.\+tpp}
+\hypertarget{funkcijos1_8tpp_source}{}\label{funkcijos1_8tpp_source}\doxymbox{\hyperlink{funkcijos1_8tpp}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \#include\ <fstream>}
+\DoxyCodeLine{00002\ \#include\ <sstream>}
+\DoxyCodeLine{00003\ \#include\ <iostream>}
+\DoxyCodeLine{00004\ \#include\ <algorithm>}
+\DoxyCodeLine{00005\ \#include\ <type\_traits>}
+\DoxyCodeLine{00006\ \#include\ <vector>}
+\DoxyCodeLine{00007\ \#include\ <list>}
+\DoxyCodeLine{00008\ \#include\ "{}studentai1.h"{}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ template\ <typename\ Container>}
+\DoxyCodeLine{00011\ void\ skaityti(Container\&\ grupe,\ const\ std::string\&\ failas)\ \{}
+\DoxyCodeLine{00012\ \ \ \ \ grupe.clear();}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \ \ \ \ if\ constexpr\ (std::is\_same<Container,\ std::vector<Studentas>>::value)}
+\DoxyCodeLine{00015\ \ \ \ \ \ \ \ \ grupe.reserve(10000000);}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \ \ \ \ std::ifstream\ in(failas);}
+\DoxyCodeLine{00018\ \ \ \ \ in.sync\_with\_stdio(false);}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \ \ \ \ if\ (!in.is\_open())\ \{}
+\DoxyCodeLine{00021\ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}Nepavyko\ atidaryti\ failo:\ "{}\ <<\ failas\ <<\ "{}\(\backslash\)n"{};}
+\DoxyCodeLine{00022\ \ \ \ \ \ \ \ \ return;}
+\DoxyCodeLine{00023\ \ \ \ \ \}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \ \ \ \ std::string\ line;}
+\DoxyCodeLine{00026\ \ \ \ \ std::getline(in,\ line);\ //\ skip\ header}
+\DoxyCodeLine{00027\ }
+\DoxyCodeLine{00028\ \ \ \ \ while\ (std::getline(in,\ line))\ \{}
+\DoxyCodeLine{00029\ \ \ \ \ \ \ \ \ if\ (line.empty())\ continue;}
+\DoxyCodeLine{00030\ }
+\DoxyCodeLine{00031\ \ \ \ \ \ \ \ \ std::istringstream\ iss(line);}
+\DoxyCodeLine{00032\ \ \ \ \ \ \ \ \ Studentas\ A;}
+\DoxyCodeLine{00033\ }
+\DoxyCodeLine{00034\ \ \ \ \ \ \ \ \ std::string\ v,\ p;}
+\DoxyCodeLine{00035\ \ \ \ \ \ \ \ \ iss\ >>\ v\ >>\ p;}
+\DoxyCodeLine{00036\ \ \ \ \ \ \ \ \ if\ (v.empty()\ ||\ p.empty())\ continue;}
+\DoxyCodeLine{00037\ \ \ \ \ \ \ \ \ A.setVardas(v);}
+\DoxyCodeLine{00038\ \ \ \ \ \ \ \ \ A.setPavarde(p);}
+\DoxyCodeLine{00039\ }
+\DoxyCodeLine{00040\ \ \ \ \ \ \ \ \ std::vector<int>\ visi;}
+\DoxyCodeLine{00041\ \ \ \ \ \ \ \ \ visi.reserve(6);}
+\DoxyCodeLine{00042\ \ \ \ \ \ \ \ \ int\ x;}
+\DoxyCodeLine{00043\ \ \ \ \ \ \ \ \ while\ (iss\ >>\ x)\ visi.push\_back(x);}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \ \ \ \ \ \ \ \ if\ (visi.size()\ <\ 2)\ continue;}
+\DoxyCodeLine{00046\ }
+\DoxyCodeLine{00047\ \ \ \ \ \ \ \ \ int\ egz\ =\ visi.back();}
+\DoxyCodeLine{00048\ \ \ \ \ \ \ \ \ visi.pop\_back();}
+\DoxyCodeLine{00049\ \ \ \ \ \ \ \ \ A.setEgz(egz);}
+\DoxyCodeLine{00050\ \ \ \ \ \ \ \ \ A.setPaz(std::move(visi));}
+\DoxyCodeLine{00051\ \ \ \ \ \ \ \ \ A.finalize();}
+\DoxyCodeLine{00052\ }
+\DoxyCodeLine{00053\ \ \ \ \ \ \ \ \ grupe.push\_back(std::move(A));}
+\DoxyCodeLine{00054\ \ \ \ \ \}}
+\DoxyCodeLine{00055\ \}}
+\DoxyCodeLine{00056\ }
+\DoxyCodeLine{00057\ template\ <typename\ Container>}
+\DoxyCodeLine{00058\ void\ rikiuoti(Container\&\ grupe)\ \{}
+\DoxyCodeLine{00059\ \ \ \ \ if\ constexpr\ (std::is\_same<Container,\ std::list<Studentas>>::value)}
+\DoxyCodeLine{00060\ \ \ \ \ \ \ \ \ grupe.sort(compareVid);}
+\DoxyCodeLine{00061\ \ \ \ \ else}
+\DoxyCodeLine{00062\ \ \ \ \ \ \ \ \ std::sort(grupe.begin(),\ grupe.end(),\ compareVid);}
+\DoxyCodeLine{00063\ \}}
+\DoxyCodeLine{00064\ }
+\DoxyCodeLine{00065\ template\ <typename\ Container>}
+\DoxyCodeLine{00066\ void\ skirstyti1(const\ Container\&\ grupe,\ Container\&\ vargsiukai,\ Container\&\ kietiakai)\ \{}
+\DoxyCodeLine{00067\ \ \ \ \ std::partition\_copy(}
+\DoxyCodeLine{00068\ \ \ \ \ \ \ \ \ grupe.begin(),\ grupe.end(),}
+\DoxyCodeLine{00069\ \ \ \ \ \ \ \ \ std::back\_inserter(kietiakai),}
+\DoxyCodeLine{00070\ \ \ \ \ \ \ \ \ std::back\_inserter(vargsiukai),}
+\DoxyCodeLine{00071\ \ \ \ \ \ \ \ \ [](const\ Studentas\&\ s)\ \{\ return\ s.vid()\ >=\ 5.0;\ \}}
+\DoxyCodeLine{00072\ \ \ \ \ );}
+\DoxyCodeLine{00073\ \}}
+\DoxyCodeLine{00074\ }
+\DoxyCodeLine{00075\ template\ <typename\ Container>}
+\DoxyCodeLine{00076\ void\ skirstyti2(Container\&\ studentai,\ Container\&\ vargsiukai)\ \{}
+\DoxyCodeLine{00077\ \ \ \ \ std::copy\_if(}
+\DoxyCodeLine{00078\ \ \ \ \ \ \ \ \ studentai.begin(),\ studentai.end(),}
+\DoxyCodeLine{00079\ \ \ \ \ \ \ \ \ std::back\_inserter(vargsiukai),}
+\DoxyCodeLine{00080\ \ \ \ \ \ \ \ \ [](const\ Studentas\&\ s)\ \{\ return\ s.vid()\ <\ 5.0;\ \}}
+\DoxyCodeLine{00081\ \ \ \ \ );}
+\DoxyCodeLine{00082\ \ \ \ \ auto\ it\ =\ std::remove\_if(}
+\DoxyCodeLine{00083\ \ \ \ \ \ \ \ \ studentai.begin(),\ studentai.end(),}
+\DoxyCodeLine{00084\ \ \ \ \ \ \ \ \ [](const\ Studentas\&\ s)\ \{\ return\ s.vid()\ <\ 5.0;\ \}}
+\DoxyCodeLine{00085\ \ \ \ \ );}
+\DoxyCodeLine{00086\ \ \ \ \ studentai.erase(it,\ studentai.end());}
+\DoxyCodeLine{00087\ \}}
+\DoxyCodeLine{00088\ }
+\DoxyCodeLine{00089\ template\ <typename\ Container>}
+\DoxyCodeLine{00090\ void\ skirstyti3(Container\&\ studentai,\ Container\&\ vargsiukai)\ \{}
+\DoxyCodeLine{00091\ \ \ \ \ if\ constexpr\ (std::is\_same<Container,\ std::list<Studentas>>::value)\ \{}
+\DoxyCodeLine{00092\ \ \ \ \ \ \ \ \ for\ (auto\ it\ =\ studentai.begin();\ it\ !=\ studentai.end();)\ \{}
+\DoxyCodeLine{00093\ \ \ \ \ \ \ \ \ \ \ \ \ if\ (it-\/>vid()\ <\ 5.0)}
+\DoxyCodeLine{00094\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ vargsiukai.splice(vargsiukai.end(),\ studentai,\ it++);}
+\DoxyCodeLine{00095\ \ \ \ \ \ \ \ \ \ \ \ \ else}
+\DoxyCodeLine{00096\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ ++it;}
+\DoxyCodeLine{00097\ \ \ \ \ \ \ \ \ \}}
+\DoxyCodeLine{00098\ \ \ \ \ \}}
+\DoxyCodeLine{00099\ \ \ \ \ else\ \{}
+\DoxyCodeLine{00100\ \ \ \ \ \ \ \ \ auto\ it\ =\ std::partition(}
+\DoxyCodeLine{00101\ \ \ \ \ \ \ \ \ \ \ \ \ studentai.begin(),\ studentai.end(),}
+\DoxyCodeLine{00102\ \ \ \ \ \ \ \ \ \ \ \ \ [](const\ Studentas\&\ s)\ \{\ return\ s.vid()\ >=\ 5.0;\ \}}
+\DoxyCodeLine{00103\ \ \ \ \ \ \ \ \ );}
+\DoxyCodeLine{00104\ \ \ \ \ \ \ \ \ std::copy(it,\ studentai.end(),\ std::back\_inserter(vargsiukai));}
+\DoxyCodeLine{00105\ \ \ \ \ \ \ \ \ studentai.erase(it,\ studentai.end());}
+\DoxyCodeLine{00106\ \ \ \ \ \}}
+\DoxyCodeLine{00107\ \}}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ template\ <typename\ Container>}
+\DoxyCodeLine{00110\ void\ isvestifaila(const\ Container\&\ grupe,\ const\ std::string\&\ failas)\ \{}
+\DoxyCodeLine{00111\ \ \ \ \ std::ofstream\ out(failas);}
+\DoxyCodeLine{00112\ \ \ \ \ out.sync\_with\_stdio(false);}
+\DoxyCodeLine{00113\ \ \ \ \ for\ (const\ auto\&\ s\ :\ grupe)}
+\DoxyCodeLine{00114\ \ \ \ \ \ \ \ \ out\ <<\ s.vardas()\ <<\ '\ '\ <<\ s.pavarde()\ <<\ '\ '\ <<\ s.vid()\ <<\ '\(\backslash\)n';}
+\DoxyCodeLine{00115\ \}}
+\DoxyCodeLine{00116\ }
+\DoxyCodeLine{00117\ inline\ void\ generuotifaila(int\ kiek,\ const\ std::string\&\ failas)\ \{}
+\DoxyCodeLine{00118\ \ \ \ \ std::ofstream\ out(failas);}
+\DoxyCodeLine{00119\ \ \ \ \ out.sync\_with\_stdio(false);}
+\DoxyCodeLine{00120\ \ \ \ \ out\ <<\ "{}Vardas\ Pavarde\ ND1\ ND2\ ND3\ ND4\ ND5\ Egz\(\backslash\)n"{};}
+\DoxyCodeLine{00121\ \ \ \ \ for\ (int\ i\ =\ 1;\ i\ <=\ kiek;\ i++)\ \{}
+\DoxyCodeLine{00122\ \ \ \ \ \ \ \ \ out\ <<\ "{}Vardas"{}\ <<\ i\ <<\ "{}\ Pavarde"{}\ <<\ i\ <<\ '\ ';}
+\DoxyCodeLine{00123\ \ \ \ \ \ \ \ \ for\ (int\ j\ =\ 0;\ j\ <\ 5;\ j++)}
+\DoxyCodeLine{00124\ \ \ \ \ \ \ \ \ \ \ \ \ out\ <<\ rand()\ \%\ 10\ +\ 1\ <<\ '\ ';}
+\DoxyCodeLine{00125\ \ \ \ \ \ \ \ \ out\ <<\ rand()\ \%\ 10\ +\ 1\ <<\ '\(\backslash\)n';}
+\DoxyCodeLine{00126\ \ \ \ \ \ \ \ \ if\ (i\ \%\ 100000\ ==\ 0)}
+\DoxyCodeLine{00127\ \ \ \ \ \ \ \ \ \ \ \ \ std::cout\ <<\ "{}Sugeneruota:\ "{}\ <<\ i\ <<\ '\(\backslash\)n';}
+\DoxyCodeLine{00128\ \ \ \ \ \}}
+\DoxyCodeLine{00129\ \}}
+
+\end{DoxyCode}
