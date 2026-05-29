@@ -20,13 +20,29 @@ public:
 
     Zmogus(Zmogus&& other) noexcept
         : vardas_(std::move(other.vardas_)),
-          pavarde_(std::move(other.pavarde_)) {}
+        pavarde_(std::move(other.pavarde_)) {}
+
+    Zmogus& operator=(const Zmogus& other) {
+        if (this != &other) {
+            vardas_ = other.vardas_;
+            pavarde_ = other.pavarde_;
+        }
+        return *this;
+    }
+
+    Zmogus& operator=(Zmogus&& other) noexcept {
+        if (this != &other) {
+            vardas_ = std::move(other.vardas_);
+            pavarde_ = std::move(other.pavarde_);
+        }
+        return *this;
+    }
 
     virtual ~Zmogus() {}
 
-    inline const std::string& vardas()  const { return vardas_;  }
+    inline const std::string& vardas()  const { return vardas_; }
     inline const std::string& pavarde() const { return pavarde_; }
-    void setVardas(const std::string& v)  { vardas_  = v; }
+    void setVardas(const std::string& v) { vardas_ = v; }
     void setPavarde(const std::string& p) { pavarde_ = p; }
 };
 
