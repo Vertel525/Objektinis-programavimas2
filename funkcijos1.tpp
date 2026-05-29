@@ -30,7 +30,11 @@ void skaityti(Container& grupe, const std::string& failas) {
 
         std::istringstream iss(line);
         Studentas A;
-        iss >> A.vardas >> A.pavarde;
+        std::string v, p;
+        iss >> v >> p;
+        if (v.empty() || p.empty()) continue;
+        A.setVardas(v);
+        A.setPavarde(p);
 
         if (A.vardas.empty() || A.pavarde.empty()) continue;
 
@@ -41,10 +45,11 @@ void skaityti(Container& grupe, const std::string& failas) {
 
         if (visi.size() < 2) continue;
 
-        A.egz = visi.back();
-        visi.pop_back();
-        A.paz = std::move(visi);
-        A.skaiciuoti();
+       int egz = visi.back();
+       visi.pop_back();
+       A.setEgz(egz);
+       A.setPaz(std::move(visi));
+       A.finalize()
 
         grupe.push_back(std::move(A));
     }
