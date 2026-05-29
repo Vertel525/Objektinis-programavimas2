@@ -11,6 +11,7 @@ C++ programa skirta studentų pažymių valdymui. Programa leidžia įvesti stud
 | v1.0 | Pradinė realizacija su `struct Studentas`, vector/list/deque konteineriai, 3 skirstymo strategijos |
 | v1.1 | `struct` pakeista į `class`, pridėti konstruktoriai, destruktorius, getter/setter metodai |
 | v1.2 | Pridėti `operator<<` ir `operator>>`, pilnas Rule of Five, testų failas |
+| v1.3 | Sukurti abstrakčią klasę, kurioje negalima kurti žmogaus tipo objektų, derived klasė, testai|
 
 ---
 
@@ -22,7 +23,8 @@ C++ programa skirta studentų pažymių valdymui. Programa leidžia įvesti stud
 ├── funkcijos1.tpp     # Template funkcijų realizacijos
 ├── funkcijos1.cpp     # Įvesties/išvesties funkcijų realizacijos
 ├── main1.cpp          # Pagrindinis failas
-└── testas.cpp         # Vienetų testai
+├── testas.cpp         # Vienetų testai
+└── zmogus.h           # Zmogus klasė
 ```
 
 ---
@@ -120,38 +122,7 @@ g++ -std=c++17 -o testas testas.cpp
 
 ## Testų rezultatai
 
-Paleidus `testas.cpp`:
+<img width="1639" height="1420" alt="Screenshot 2026-05-29 050106" src="https://github.com/user-attachments/assets/1fe3a59d-ca5d-4ae6-9fa8-2510b3f99c3e" />
+<img width="1554" height="1405" alt="Screenshot 2026-05-29 050135" src="https://github.com/user-attachments/assets/d98cebc0-835d-4aa1-a1c4-e0c6a823cca0" />
+<img width="1741" height="1431" alt="Screenshot 2026-05-29 050123" src="https://github.com/user-attachments/assets/975cceda-861a-40ad-9df1-302afd73e9cd" />
 
-```
-========== Studentas klases testai ==========
-
---- Default Constructor ---
-  [PASS] vardas is empty
-  [PASS] pavarde is empty
-  [PASS] egz is 0
-  [PASS] vid is 0.0
-  [PASS] paz is empty
-
---- Copy Constructor ---
-  [PASS] vardas copied
-  [PASS] original not affected by copy change
-  ...
-
-========== Rezultatai ==========
-Praejo : 58
-Nepraejo: 0
-Visi testai sekmingai praejo!
-```
-
----
-
-## Programos meniu
-
-```
-1 - ivedimas ranka
-2 - generuojami pazymiai
-3 - generuojami studentai ir pazymiai
-4 - baigti darba
-5 - nuskaityti faila (vector)
-6 - failo generavimas ir benchmark
-```
