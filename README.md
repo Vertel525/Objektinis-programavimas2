@@ -1,4 +1,3 @@
-# Studentų Registras v1.0
 
 Programa skirta studentų duomenų apdorojimui ir analizavimui. Vartotojas gali:
 - įvesti studentų duomenis ranka;
@@ -8,18 +7,6 @@ Programa skirta studentų duomenų apdorojimui ir analizavimui. Vartotojas gali:
 - atlikti skirtingų konteinerių ir studentų skirstymo strategijų veikimo spartos tyrimą.
 
 Programoje realizuotos trys studentų skirstymo strategijos, kurių veikimo laikas lyginamas su skirtingo dydžio duomenų failais naudojant `vector`, `list` ir `deque` konteinerius.
-
----
-
-## Versijų istorija
-
-| Versija | Aprašymas |
-|---------|-----------|
-| v0.1 | Pradinis veikiantis variantas — rankinis įvedimas, skaičiavimas, išvedimas |
-| v0.2 | Nuskaitymas iš failo, rūšiavimas, skirstymas į dvi grupes |
-| v0.3 | Failų generavimas, testavimas su dideliais duomenų kiekiais |
-| v0.4 | Optimizuotas skirstymas, patobulintas išvedimas į failą |
-| v1.0 | Pridėtas `std::list` ir `std::deque` palaikymas, 3 skirstymo strategijos, greičio tyrimas |
 
 ---
 
