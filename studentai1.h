@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 class Studentas {
 private:
@@ -13,30 +14,25 @@ private:
     int egz_ = 0;
     double vid_ = 0.0;
     double med_ = 0.0;
+
+    void skaiciuoti() {
+        int n = (int)paz_.size();
+        if (n == 0) return;
+        int sum = 0;
+        for (int x : paz_) sum += x;
+        vid_ = sum * 1.0 / n * 0.4 + egz_ * 0.6;
+        std::vector<int> sorted = paz_;
+        std::sort(sorted.begin(), sorted.end());
+        if (n % 2 != 0)
+            med_ = sorted[n / 2];
+        else
+            med_ = (sorted[n / 2 - 1] + sorted[n / 2]) / 2.0;
+        med_ = med_ * 0.4 + egz_ * 0.6;
+    }
+
 public:
     Studentas() : egz_(0), vid_(0.0), med_(0.0) {}
 
-
-void skaiciuoti() {
-    int n = (int)paz_.size();
-
-    if (n == 0) return;
-    int sum = 0;
-
-    for (int x : paz_) sum += x;
-    vid_ = sum * 1.0 / n * 0.4 + egz_ * 0.6;
-
-    std::vector<int> sorted = paz_;
-    std::sort(sorted.begin(), sorted.end());
-
-    if (n % 2 != 0)
-        med_ = sorted[n / 2];
-    else
-        med_ = (sorted[n / 2 - 1] + sorted[n / 2]) / 2.0;
-    med_ = med_ * 0.4 + egz_ * 0.6;
-}
-
-public: 
     Studentas(const std::string& vardas, const std::string& pavarde,
         const std::vector<int>& paz, int egz)
         : vardas_(vardas), pavarde_(pavarde), paz_(paz), egz_(egz)
@@ -94,5 +90,21 @@ public:
     void setPaz(std::vector<int>&& p) { paz_ = std::move(p); }
     void addPaz(int p) { paz_.push_back(p); }
     void finalize() { skaiciuoti(); }
+    friend std::ostream& operator<<(std::ostream& os, const Studentas& s) {
+        os << s.vardas_ << " " << s.pavarde_;
+        for (int p : s.paz_) os << " " << p;
+        os << " " << s.egz_;
+        os << " (vid: " << s.vid_ << ", med: " << s.med_ << ")";
+        return os;
+    }
+
+};
+
+inline bool compareVid(const Studentas& a, const Studentas& b) {
+    return a.vid() < b.vid();
+}
+inline bool comparePavarde(const Studentas& a, const Studentas& b) {
+    return a.pavarde() < b.pavarde();
+}
 
 #endif
