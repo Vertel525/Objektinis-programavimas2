@@ -88,4 +88,11 @@ public:
     inline double vid() const { return vid_; }
     inline double med() const { return med_; }
 
+    void setVardas(const std::string& v) { vardas_ = v; }
+    void setPavarde(const std::string& p) { pavarde_ = p; }
+    void setEgz(int e) { egz_ = e; }
+    void setPaz(std::vector<int>&& p) { paz_ = std::move(p); }
+    void addPaz(int p) { paz_.push_back(p); }
+    void finalize() { skaiciuoti(); }
+
 #endif
