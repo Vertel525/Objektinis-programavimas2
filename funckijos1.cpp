@@ -1,4 +1,4 @@
-#include "funkcijos1.h"
+#include "funkcijos2.h"
 #include <iostream>
 #include <iomanip>
 #include <algorithm>
@@ -21,16 +21,19 @@ using std::setprecision;
 void inranka(vector<Studentas>& grupe) {
     while (true) {
         Studentas A;
+        string v, p;
         cout << "Iveskite studento varda ir pavarde (0 - baigti): ";
-        cin >> A.vardas >> A.pavarde;
-        if (A.vardas == "0" || A.pavarde == "0") break;
+        cin >> v >> p;
+        if (v == "0" || p == "0") break;
+        A.setVardas(v);
+        A.setPavarde(p);
 
         cout << "Iveskite pazymius (0 - baigti): ";
         int temp;
         while (true) {
             if (cin >> temp) {
                 if (temp == 0) break;
-                if (temp >= 1 && temp <= 10) A.paz.push_back(temp);
+                if (temp >= 1 && temp <= 10) A.addPaz(temp);
                 else cout << "Neteisingas pazymys (1-10 arba 0): ";
             }
             else {
@@ -41,14 +44,15 @@ void inranka(vector<Studentas>& grupe) {
         }
 
         cout << "Iveskite egzamino rezultata (1-10): ";
+        int egz;
         while (true) {
-            if (cin >> A.egz && A.egz >= 1 && A.egz <= 10) break;
+            if (cin >> egz && egz >= 1 && egz <= 10) break;
             cout << "Neteisingas ivedimas (1-10): ";
             cin.clear();
             cin.ignore(10000, '\n');
         }
-
-        A.skaiciuoti();
+        A.setEgz(egz);
+        A.finalize();
         grupe.push_back(std::move(A));
     }
 }
@@ -56,20 +60,25 @@ void inranka(vector<Studentas>& grupe) {
 void randpazymiai(vector<Studentas>& grupe) {
     while (true) {
         Studentas A;
+        string v, p;
         cout << "Iveskite studento varda ir pavarde (0 - baigti): ";
-        cin >> A.vardas >> A.pavarde;
-        if (A.vardas == "0" || A.pavarde == "0") break;
+        cin >> v >> p;
+        if (v == "0" || p == "0") break;
+        A.setVardas(v);
+        A.setPavarde(p);
 
         int kiek;
         cout << "Kiek atsitiktiniu pazymiu? ";
         cin >> kiek;
 
-        A.paz.reserve(kiek);
+        vector<int> paz;
+        paz.reserve(kiek);
         for (int i = 0; i < kiek; i++)
-            A.paz.push_back(rand() % 10 + 1);
+            paz.push_back(rand() % 10 + 1);
+        A.setPaz(std::move(paz));
 
-        A.egz = rand() % 10 + 1;
-        A.skaiciuoti();
+        A.setEgz(rand() % 10 + 1);
+        A.finalize();
         grupe.push_back(std::move(A));
     }
 }
@@ -80,10 +89,10 @@ void randomvisk(vector<Studentas>& grupe) {
     cin >> kiek1;
 
     vector<string> vardai = { "Kazys","Petriukas","Alfonsas","Jonas","Dziugas",
-                                "Algis","Eugenija","Agne","Vitalija","Anastasija" };
+                               "Algis","Eugenija","Agne","Vitalija","Anastasija" };
     vector<string> pavardes = { "Ilgauskas","Javtokas","Katunskyte","Audrinis",
-                                 "Milinskas","Aleksandravicius","Siskauskas",
-                                 "Grybauskaite","Meilutyte","Cmilyte" };
+                                "Milinskas","Aleksandravicius","Siskauskas",
+                                "Grybauskaite","Meilutyte","Cmilyte" };
 
     int kiek;
     cout << "Kiek atsitiktiniu pazymiu kiekvienam? ";
@@ -92,15 +101,17 @@ void randomvisk(vector<Studentas>& grupe) {
     grupe.reserve(grupe.size() + kiek1);
     for (int i = 0; i < kiek1; i++) {
         Studentas A;
-        A.vardas = vardai[rand() % vardai.size()];
-        A.pavarde = pavardes[rand() % pavardes.size()];
+        A.setVardas(vardai[rand() % vardai.size()]);
+        A.setPavarde(pavardes[rand() % pavardes.size()]);
 
-        A.paz.reserve(kiek);
+        vector<int> paz;
+        paz.reserve(kiek);
         for (int j = 0; j < kiek; j++)
-            A.paz.push_back(rand() % 10 + 1);
+            paz.push_back(rand() % 10 + 1);
+        A.setPaz(std::move(paz));
 
-        A.egz = rand() % 10 + 1;
-        A.skaiciuoti();
+        A.setEgz(rand() % 10 + 1);
+        A.finalize();
         grupe.push_back(std::move(A));
     }
 }
@@ -122,14 +133,14 @@ void outputas(const vector<Studentas>& grupe, char& rez) {
 
     if (kur == 1) {
         cout << left << setw(12) << "Vardas"
-            << setw(20) << "Pavarde"
-            << (useVid ? "Vidurkis" : "Mediana") << '\n';
+             << setw(20) << "Pavarde"
+             << (useVid ? "Vidurkis" : "Mediana") << '\n';
 
         for (const auto& A : grupe)
-            cout << left << setw(12) << A.vardas
-            << setw(20) << A.pavarde
-            << fixed << setprecision(2)
-            << (useVid ? A.vid : A.med) << '\n';
+            cout << left << setw(12) << A.vardas()
+                 << setw(20) << A.pavarde()
+                 << fixed << setprecision(2)
+                 << (useVid ? A.vid() : A.med()) << '\n';
     }
     else if (kur == 2) {
         string outfailas;
@@ -141,9 +152,9 @@ void outputas(const vector<Studentas>& grupe, char& rez) {
 
         out << "Vardas,Pavarde," << (useVid ? "Vidurkis" : "Mediana") << '\n';
         for (const auto& A : grupe)
-            out << A.vardas << ',' << A.pavarde << ','
-            << fixed << setprecision(2)
-            << (useVid ? A.vid : A.med) << '\n';
+            out << A.vardas() << ',' << A.pavarde() << ','
+                << fixed << setprecision(2)
+                << (useVid ? A.vid() : A.med()) << '\n';
 
         cout << "Rezultatai issaugoti: " << outfailas << '\n';
     }
