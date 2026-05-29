@@ -31,6 +31,7 @@ private:
     }
 
 public:
+
     Studentas() : egz_(0), vid_(0.0), med_(0.0) {}
 
     Studentas(const std::string& vardas, const std::string& pavarde,
@@ -90,6 +91,28 @@ public:
     void setPaz(std::vector<int>&& p) { paz_ = std::move(p); }
     void addPaz(int p) { paz_.push_back(p); }
     void finalize() { skaiciuoti(); }
+
+    friend std::istream& operator>>(std::istream& is, Studentas& s) {
+        s.paz_.clear();
+        s.egz_ = 0;
+        s.vid_ = 0.0;
+        s.med_ = 0.0;
+
+        if (!(is >> s.vardas_ >> s.pavarde_)) return is;
+
+        std::vector<int> visi;
+        int x;
+        while (is >> x) visi.push_back(x);
+
+        if (visi.size() >= 2) {
+            s.egz_ = visi.back();
+            visi.pop_back();
+            s.paz_ = std::move(visi);
+            s.skaiciuoti();
+        }
+        return is;
+    }
+
     friend std::ostream& operator<<(std::ostream& os, const Studentas& s) {
         os << s.vardas_ << " " << s.pavarde_;
         for (int p : s.paz_) os << " " << p;
@@ -97,7 +120,6 @@ public:
         os << " (vid: " << s.vid_ << ", med: " << s.med_ << ")";
         return os;
     }
-
 };
 
 inline bool compareVid(const Studentas& a, const Studentas& b) {
