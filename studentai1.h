@@ -44,5 +44,16 @@ public:
         skaiciuoti();
     }
 
+    Studentas(const Studentas& other)
+        : vardas_(other.vardas_), pavarde_(other.pavarde_),
+        paz_(other.paz_), egz_(other.egz_),
+        vid_(other.vid_), med_(other.med_) {}
+
+    Studentas(Studentas&& other) noexcept
+        : vardas_(std::move(other.vardas_)),
+        pavarde_(std::move(other.pavarde_)),
+        paz_(std::move(other.paz_)),
+        egz_(other.egz_), vid_(other.vid_), med_(other.med_) {}
+
 
 #endif
