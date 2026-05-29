@@ -1,7 +1,6 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <cassert>
 #include <vector>
 #include "studentai1.h"
 
@@ -21,6 +20,16 @@ void check(bool condition, const string& testName) {
     }
 }
 
+void testAbstract() {
+    cout << "\n--- Zmogus abstraktumas ---\n";
+    check(true, "Zmogus negali buti sukurtas tiesiogiai (kompiliacijos klaida jei bandom)");
+
+    Studentas s("Jonas", "Jonaitis", { 6, 7, 8 }, 9);
+    Zmogus* ptr = &s;
+    check(ptr->vardas() == "Jonas", "Zmogus* rodo i Studentas objekta");
+    check(ptr->vid() > 0.0, "virtualus vid() veikia per Zmogus*");
+    check(ptr->med() > 0.0, "virtualus med() veikia per Zmogus*");
+}
 void testDefaultConstructor() {
     cout << "\n--- Default Constructor ---\n";
     Studentas s;
@@ -34,8 +43,7 @@ void testDefaultConstructor() {
 
 void testParametrizedConstructor() {
     cout << "\n--- Parametrized Constructor ---\n";
-    vector<int> paz = { 6, 7, 8 };
-    Studentas s("Jonas", "Jonaitis", paz, 9);
+    Studentas s("Jonas", "Jonaitis", { 6, 7, 8 }, 9);
     check(s.vardas() == "Jonas", "vardas correct");
     check(s.pavarde() == "Jonaitis", "pavarde correct");
     check(s.egz() == 9, "egz correct");
@@ -46,8 +54,7 @@ void testParametrizedConstructor() {
 
 void testCopyConstructor() {
     cout << "\n--- Copy Constructor ---\n";
-    vector<int> paz = { 5, 6, 7 };
-    Studentas original("Petras", "Petraitis", paz, 8);
+    Studentas original("Petras", "Petraitis", { 5, 6, 7 }, 8);
     Studentas copy(original);
     check(copy.vardas() == original.vardas(), "vardas copied");
     check(copy.pavarde() == original.pavarde(), "pavarde copied");
@@ -57,13 +64,12 @@ void testCopyConstructor() {
     check(copy.paz().size() == original.paz().size(), "paz size copied");
     Studentas copy2(original);
     copy2.setVardas("Kitas");
-    check(original.vardas() == "Petras", "original not affected by copy change");
+    check(original.vardas() == "Petras", "original not affected by copy");
 }
 
 void testMoveConstructor() {
     cout << "\n--- Move Constructor ---\n";
-    vector<int> paz = { 4, 5, 6 };
-    Studentas temp("Antanas", "Antanaitis", paz, 7);
+    Studentas temp("Antanas", "Antanaitis", { 4, 5, 6 }, 7);
     double vidBefore = temp.vid();
     Studentas moved(std::move(temp));
     check(moved.vardas() == "Antanas", "vardas moved");
@@ -74,8 +80,7 @@ void testMoveConstructor() {
 
 void testCopyAssignment() {
     cout << "\n--- Copy Assignment ---\n";
-    vector<int> paz = { 7, 8, 9 };
-    Studentas a("Algis", "Algauskas", paz, 10);
+    Studentas a("Algis", "Algauskas", { 7, 8, 9 }, 10);
     Studentas b;
     b = a;
     check(b.vardas() == a.vardas(), "vardas assigned");
@@ -88,8 +93,7 @@ void testCopyAssignment() {
 
 void testMoveAssignment() {
     cout << "\n--- Move Assignment ---\n";
-    vector<int> paz = { 3, 4, 5 };
-    Studentas a("Zigmas", "Zigmauskas", paz, 6);
+    Studentas a("Zigmas", "Zigmauskas", { 3, 4, 5 }, 6);
     double vidBefore = a.vid();
     Studentas b;
     b = std::move(a);
@@ -102,8 +106,7 @@ void testMoveAssignment() {
 void testDestructor() {
     cout << "\n--- Destructor ---\n";
     {
-        vector<int> paz = { 1, 2, 3 };
-        Studentas s("Temp", "Tempauskas", paz, 5);
+        Studentas s("Temp", "Tempauskas", { 1, 2, 3 }, 5);
     }
     check(true, "destructor called without crash");
 }
@@ -124,7 +127,6 @@ void testSettersAndFinalize() {
     check(s.paz().size() == 3, "addPaz works");
     check(s.vid() > 0.0, "finalize calculates vid");
     check(s.med() > 0.0, "finalize calculates med");
-
     vector<int> newPaz = { 1, 2 };
     s.setPaz(std::move(newPaz));
     s.finalize();
@@ -132,9 +134,8 @@ void testSettersAndFinalize() {
 }
 
 void testOutputOperator() {
-    cout << "\n--- operator<< (output) ---\n";
-    vector<int> paz = { 6, 7 };
-    Studentas s("Jonas", "Jonaitis", paz, 8);
+    cout << "\n--- operator<< ---\n";
+    Studentas s("Jonas", "Jonaitis", { 6, 7 }, 8);
     ostringstream oss;
     oss << s;
     string result = oss.str();
@@ -144,10 +145,15 @@ void testOutputOperator() {
     check(result.find("vid:") != string::npos, "vid label in output");
     check(result.find("med:") != string::npos, "med label in output");
     cout << "  Output: " << s << "\n";
+
+    Zmogus* ptr = &s;
+    ostringstream oss2;
+    oss2 << *ptr;
+    check(oss2.str().find("Jonas") != string::npos, "operator<< via Zmogus* works");
 }
 
 void testInputOperator() {
-    cout << "\n--- operator>> (input from string) ---\n";
+    cout << "\n--- operator>> (from string) ---\n";
     istringstream iss("Petras Petraitis 5 6 7 8 9");
     Studentas s;
     iss >> s;
@@ -160,7 +166,7 @@ void testInputOperator() {
 }
 
 void testInputOperatorFromFile() {
-    cout << "\n--- operator>> (input from file) ---\n";
+    cout << "\n--- operator>> (from file) ---\n";
     {
         ofstream out("test_temp.txt");
         out << "Vardas Pavarde 5 6 7 8 9\n";
@@ -176,9 +182,8 @@ void testInputOperatorFromFile() {
 }
 
 void testOutputOperatorToFile() {
-    cout << "\n--- operator<< (output to file) ---\n";
-    vector<int> paz = { 5, 6 };
-    Studentas s("Ona", "Onaite", paz, 7);
+    cout << "\n--- operator<< (to file) ---\n";
+    Studentas s("Ona", "Onaite", { 5, 6 }, 7);
     {
         ofstream out("test_out.txt");
         out << s;
@@ -193,8 +198,9 @@ void testOutputOperatorToFile() {
 }
 
 int main() {
-    cout << "========== Studentas klases testai ==========\n";
+    cout << "========== Studentas / Zmogus klases testai (v1.5) ==========\n";
 
+    testAbstract();
     testDefaultConstructor();
     testParametrizedConstructor();
     testCopyConstructor();
@@ -209,7 +215,7 @@ int main() {
     testOutputOperatorToFile();
 
     cout << "\n========== Rezultatai ==========\n";
-    cout << "Praejo : " << passed << "\n";
+    cout << "Praejo  : " << passed << "\n";
     cout << "Nepraejo: " << failed << "\n";
     if (failed == 0)
         cout << "Visi testai sekmingai praejo!\n";
