@@ -1,46 +1,151 @@
+# Studentų Pažymių Skaičiuoklė
 
-Programa skirta studentų duomenų apdorojimui ir analizavimui. Vartotojas gali:
-- įvesti studentų duomenis ranka;
-- automatiškai sugeneruoti pažymius arba studentų įrašus;
-- nuskaityti studentų duomenis iš failo;
-- sugeneruoti testinius failus;
-- atlikti skirtingų konteinerių ir studentų skirstymo strategijų veikimo spartos tyrimą.
-
-Programoje realizuotos trys studentų skirstymo strategijos, kurių veikimo laikas lyginamas su skirtingo dydžio duomenų failais naudojant `vector`, `list` ir `deque` konteinerius.
+C++ programa skirta studentų pažymių valdymui. Programa leidžia įvesti studentus rankiniu būdu, generuoti atsitiktinius duomenis arba nuskaityti iš failo, tada rikiuoti ir skirstyti studentus pagal vidurkį.
 
 ---
 
-## Įdiegimo instrukcija
+## Versijų istorija
 
-### Reikalavimai
-- C++17 palaikantis kompiliatorius (GCC 8+, MSVC 2019+, Clang 7+)
-- CMake 3.16+
+| Versija | Aprašas |
+|---------|---------|
+| v1.0 | Pradinė realizacija su `struct Studentas`, vector/list/deque konteineriai, 3 skirstymo strategijos |
+| v1.1 | `struct` pakeista į `class`, pridėti konstruktoriai, destruktorius, getter/setter metodai |
+| v1.2 | Pridėti `operator<<` ir `operator>>`, pilnas Rule of Five, testų failas |
 
-### Kompiliavimas su CMake
+---
 
-```bash
-git clone https://github.com/Vertel525/Objektinis-programavimas
-cd Objektinis-programavimas
-mkdir build && cd build
-cmake ..
-cmake --build . --config Release
+## Failų struktūra
+
 ```
-
-### Paleidimas
-
-```bash
-# Windows
-main1.exe
-
-# Linux / macOS
-./main1
+├── studentai1.h       # Studentas klasė
+├── funkcijos1.h       # Funkcijų deklaracijos
+├── funkcijos1.tpp     # Template funkcijų realizacijos
+├── funkcijos1.cpp     # Įvesties/išvesties funkcijų realizacijos
+├── main1.cpp          # Pagrindinis failas
+└── testas.cpp         # Vienetų testai
 ```
 
 ---
 
-## Naudojimosi instrukcija
+## Studentas klasė
 
-Paleidus programą pateikiamas meniu:
+### Privačios duomenų narės
+
+| Narė | Tipas | Aprašas |
+|------|-------|---------|
+| `vardas_` | `string` | Studento vardas |
+| `pavarde_` | `string` | Studento pavardė |
+| `paz_` | `vector<int>` | Namų darbų pažymiai |
+| `egz_` | `int` | Egzamino pažymys |
+| `vid_` | `double` | Galutinis balas (vidurkis) |
+| `med_` | `double` | Galutinis balas (mediana) |
+
+---
+
+## Rule of Five
+
+Visi penki metodai yra pilnai realizuoti `studentai1.h` faile:
+
+| Metodas | Aprašas |
+|---------|---------|
+| Kopijuojantis konstruktorius | Gili kopija — originalas nepasikeičia |
+| Perkeliantis konstruktorius | Perima duomenis iš laikino objekto, šaltinis ištuštinamas |
+| Kopijuojantis priskyrimo operatorius | Kopijuoja duomenis, saugus savęs priskyrimo atveju |
+| Perkeliantis priskyrimo operatorius | Perima duomenis, šaltinis ištuštinamas |
+| Destruktorius | Atlaisvina atmintį, kviečiamas automatiškai |
+
+---
+
+## Perdengtų operatorių aprašas
+
+### `operator<<` — išvestis
+
+Leidžia išvesti studento duomenis į bet kokį išvesties srautą: `cout`, failą, `ostringstream`.
+
+### `operator>>` — įvestis
+
+Leidžia nuskaityti studento duomenis iš bet kokio įvesties srauto: `cin`, failo, `istringstream`.
+
+---
+
+## Duomenų įvestis ir išvestis
+
+### Įvestis rankiniu būdu (pasirinkimas 1)
+Vartotojas įveda vardą, pavardę, pažymius ir egzaminą per konsolę.
+
+### Įvestis automatiškai (pasirinkimai 2 ir 3)
+Programa pati sugeneruoja atsitiktinius pažymius arba atsitiktinius studentus su pažymiais.
+
+### Įvestis iš failo (pasirinkimas 5 ir 6)
+Nuskaitoma iš `.txt` failo. Failo formatas:
+```
+Vardas Pavarde ND1 ND2 ND3 ND4 ND5 Egz
+Vardas1 Pavarde1 4 6 7 8 9 10
+Vardas2 Pavarde2 3 5 6 7 8 7
+```
+
+### Išvestis į ekraną
+Rodo vardą, pavardę ir galutinį balą (vidurkį arba medianą) lentelės formatu.
+
+### Išvestis į CSV failą
+Išsaugo rezultatus CSV formatu, kurį galima atidaryti Excel programoje.
+
+### Išvestis į tekstinį failą
+Skirstymo rezultatai (vargšiukai / kietiakai) išsaugomi atskiruose failuose `vargsiukai.txt` ir `kietiakai.txt`.
+
+---
+
+## Skirstymo strategijos
+
+| Strategija | Aprašas |
+|------------|---------|
+| `skirstyti1` | `partition_copy` — kopijuoja į du atskirus konteinerius |
+| `skirstyti2` | `copy_if` + `remove_if` — kopijuoja vargšiukus, šalina iš originalo |
+| `skirstyti3` | `partition` arba `splice` (list) — skirstoma vietoje |
+
+---
+
+## Kompiliavimas
+
+```bash
+# Pagrindinis programas
+g++ -std=c++17 -O2 -o programa main2.cpp funkcijos2.cpp
+
+# Testai
+g++ -std=c++17 -o testas testas.cpp
+./testas
+```
+
+---
+
+## Testų rezultatai
+
+Paleidus `testas.cpp`:
+
+```
+========== Studentas klases testai ==========
+
+--- Default Constructor ---
+  [PASS] vardas is empty
+  [PASS] pavarde is empty
+  [PASS] egz is 0
+  [PASS] vid is 0.0
+  [PASS] paz is empty
+
+--- Copy Constructor ---
+  [PASS] vardas copied
+  [PASS] original not affected by copy change
+  ...
+
+========== Rezultatai ==========
+Praejo : 58
+Nepraejo: 0
+Visi testai sekmingai praejo!
+```
+
+---
+
+## Programos meniu
 
 ```
 1 - ivedimas ranka
@@ -50,56 +155,3 @@ Paleidus programą pateikiamas meniu:
 5 - nuskaityti faila (vector)
 6 - failo generavimas ir benchmark
 ```
-
-### Režimas 6 — Benchmark
-
-```
-1 - Generuoti failus      (sukuria 1000.txt ... 10000000.txt)
-2 - Paleisti benchmark    (matuoja laiką visiems konteineriams ir strategijoms)
-```
-
-Įvedus `2`, programa paprašys failo pavadinimo ir išmatuos nuskaitymo, rūšiavimo ir visų 3 skirstymo strategijų laiką kiekvienam konteineriui.
-
----
-
-## Testavimo sistemos parametrai
-
-| Komponentas | Specifikacija |
-|-------------|---------------|
-| CPU | Intel Core i7-13650HX |
-| GPU | NVIDIA RTX 5060 Mobile |
-| RAM | 24 GB |
-| Saugykla | SSD |
-| OS | Windows |
-
----
-
-## v1.1 rezultatai
-
-Šioje versijoje (v1.1) programa perrašyta naudojant `class` vietoje `struct`. 
-Atliktas tyrimas siekiant palyginti šių dviejų realizacijų efektyvumą apdorojant studentų duomenis.
-
-Testavimas atliktas:
-- naudojant **vector konteinerį**
-- taikant **3 skirstymo strategiją (partition)**
-- su skirtingais kompiliatoriaus optimizavimo lygiais: **-O1, -O2, -O3**
-
-# Tyrimo rezultatai
-
-100000 studentų
-
-| Optimizacija | Laikas (class) | Laikas (struct) | Failo dydis (class) | Failo dydis (struct) |
-|--------------|----------------|-----------------|---------------------|----------------------|
-| -O1          |  0.259675 s    | 0.246076 s      | 326 KB              |     339 KB           |
-| -O2          |  0.249686 s    | 0.244191 s      | 309 KB              |     322 KB           |
-| -O3          |  0.249245 s    | 0.247485 s      | 341 KB              |     323 KB           |
-------------------------------------------------------------------------------------------------
-
-1000000 studentų
-
-| Optimizacija | Laikas (class) | Laikas (struct) | Failo dydis (class) | Failo dydis (struct) |
-|--------------|----------------|-----------------|---------------------|----------------------|
-| -O1          | 1.30572 s      | 1.23554 s       | 326 KB              |  339 KB              |
-| -O2          | 1.25852 s      | 1.20096 s       | 309 KB              |  322 KB              |
-| -O3          | 1.25299 s      | 1.20199 s       | 341 KB              |  323 KB              |
-------------------------------------------------------------------------------------------------
