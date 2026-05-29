@@ -80,4 +80,12 @@ public:
     }
 
     ~Studentas() {}
+
+    inline const std::string& vardas()  const { return vardas_; }
+    inline const std::string& pavarde() const { return pavarde_; }
+    inline const std::vector<int>& paz() const { return paz_; }
+    inline int    egz() const { return egz_; }
+    inline double vid() const { return vid_; }
+    inline double med() const { return med_; }
+
 #endif
