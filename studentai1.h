@@ -1,15 +1,14 @@
 #ifndef STUDENT_H
 #define STUDENT_H
 
-#include <string>
+#include "zmogus.h"
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <sstream>
 
-class Studentas {
+class Studentas : public Zmogus {
 private:
-    std::string vardas_;
-    std::string pavarde_;
     std::vector<int> paz_;
     int egz_ = 0;
     double vid_ = 0.0;
@@ -31,31 +30,28 @@ private:
     }
 
 public:
-
-    Studentas() : egz_(0), vid_(0.0), med_(0.0) {}
+    Studentas() : Zmogus(), egz_(0), vid_(0.0), med_(0.0) {}
 
     Studentas(const std::string& vardas, const std::string& pavarde,
         const std::vector<int>& paz, int egz)
-        : vardas_(vardas), pavarde_(pavarde), paz_(paz), egz_(egz)
+        : Zmogus(vardas, pavarde), paz_(paz), egz_(egz)
     {
         skaiciuoti();
     }
 
     Studentas(const Studentas& other)
-        : vardas_(other.vardas_), pavarde_(other.pavarde_),
+        : Zmogus(other),
         paz_(other.paz_), egz_(other.egz_),
         vid_(other.vid_), med_(other.med_) {}
 
     Studentas(Studentas&& other) noexcept
-        : vardas_(std::move(other.vardas_)),
-        pavarde_(std::move(other.pavarde_)),
+        : Zmogus(std::move(other)),
         paz_(std::move(other.paz_)),
         egz_(other.egz_), vid_(other.vid_), med_(other.med_) {}
 
     Studentas& operator=(const Studentas& other) {
         if (this != &other) {
-            vardas_ = other.vardas_;
-            pavarde_ = other.pavarde_;
+            Zmogus::operator=(other);
             paz_ = other.paz_;
             egz_ = other.egz_;
             vid_ = other.vid_;
@@ -66,8 +62,7 @@ public:
 
     Studentas& operator=(Studentas&& other) noexcept {
         if (this != &other) {
-            vardas_ = std::move(other.vardas_);
-            pavarde_ = std::move(other.pavarde_);
+            Zmogus::operator=(std::move(other));
             paz_ = std::move(other.paz_);
             egz_ = other.egz_;
             vid_ = other.vid_;
@@ -76,21 +71,24 @@ public:
         return *this;
     }
 
-    ~Studentas() {}
+    ~Studentas() override {}
 
-    inline const std::string& vardas()  const { return vardas_; }
-    inline const std::string& pavarde() const { return pavarde_; }
+    inline double vid() const override { return vid_; }
+    inline double med() const override { return med_; }
     inline const std::vector<int>& paz() const { return paz_; }
-    inline int    egz() const { return egz_; }
-    inline double vid() const { return vid_; }
-    inline double med() const { return med_; }
+    inline int egz() const { return egz_; }
 
-    void setVardas(const std::string& v) { vardas_ = v; }
-    void setPavarde(const std::string& p) { pavarde_ = p; }
     void setEgz(int e) { egz_ = e; }
     void setPaz(std::vector<int>&& p) { paz_ = std::move(p); }
     void addPaz(int p) { paz_.push_back(p); }
-    void finalize() { skaiciuoti(); }
+    void finalize() override { skaiciuoti(); }
+
+    void print(std::ostream& os) const override {
+        os << vardas_ << " " << pavarde_;
+        for (int p : paz_) os << " " << p;
+        os << " " << egz_;
+        os << " (vid: " << vid_ << ", med: " << med_ << ")";
+    }
 
     friend std::istream& operator>>(std::istream& is, Studentas& s) {
         s.paz_.clear();
@@ -111,14 +109,6 @@ public:
             s.skaiciuoti();
         }
         return is;
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const Studentas& s) {
-        os << s.vardas_ << " " << s.pavarde_;
-        for (int p : s.paz_) os << " " << p;
-        os << " " << s.egz_;
-        os << " (vid: " << s.vid_ << ", med: " << s.med_ << ")";
-        return os;
     }
 };
 
