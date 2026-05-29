@@ -42,8 +42,19 @@ public:
 
     inline const std::string& vardas()  const { return vardas_; }
     inline const std::string& pavarde() const { return pavarde_; }
+
     void setVardas(const std::string& v) { vardas_ = v; }
     void setPavarde(const std::string& p) { pavarde_ = p; }
+
+    virtual double vid() const = 0;
+    virtual double med() const = 0;
+    virtual void finalize() = 0;
+    virtual void print(std::ostream& os) const = 0;
+
+    friend std::ostream& operator<<(std::ostream& os, const Zmogus& z) {
+        z.print(os);
+        return os;
+    }
 };
 
 #endif
